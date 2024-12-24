@@ -6,9 +6,12 @@ from tensorflow.python.ops.gen_batch_ops import batch, batch_function
 IMAGE_SIZE = 256
 BATCH_SIZE = 32
 CHANNELS = 3
-EPOCHS = 15
+EPOCHS = 25
 INPUT_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, CHANNELS)
 N_CLASSES = 3
+VERSION = 1
+
+# TODO: Change this to be a class with methods
 
 def load_dataset():
     # Load the dataset
@@ -140,3 +143,6 @@ if __name__ == "__main__":
 
     # Save the model evaluation:
     plot_training_history(history)
+
+    # Save the model
+    model.export("../models/potato_disease_classifier")
