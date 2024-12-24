@@ -6,7 +6,7 @@ from tensorflow.python.ops.gen_batch_ops import batch, batch_function
 IMAGE_SIZE = 256
 BATCH_SIZE = 32
 CHANNELS = 3
-EPOCHS = 5
+EPOCHS = 15
 INPUT_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, CHANNELS)
 N_CLASSES = 3
 
@@ -53,41 +53,61 @@ def split_dataset(train_ds, train_size = 0.8, validation_size = 0.1, test_size =
     return train_dataset, validation_dataset, test_dataset
 
 
-def resize_and_scale():
+def resize_and_scale() -> tf.keras.Sequential:
     return tf.keras.Sequential([
         layers.Resizing(IMAGE_SIZE, IMAGE_SIZE),
         layers.Rescaling(1./255),
         ])
 
-def data_augmentation():
+def data_augmentation() -> tf.keras.Sequential:
     return tf.keras.Sequential([
         layers.RandomFlip("horizontal_and_vertical"),
         layers.RandomRotation(0.2),
         ])
 
-def build_cnn(resize_and_scale, data_augmentation):
-    model = models.Sequential([
-        layers.Input(shape=INPUT_SHAPE),  # Define the input shape explicitly
-        resize_and_scale,
-        data_augmentation,
-        layers.Conv2D(32, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, kernel_size=(3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Flatten(),
-        layers.Dense(64, activation='relu'),
-        layers.Dense(N_CLASSES, activation='softmax'),
-    ])
+def build_cnn(resize_and_scale: tf.keras.Sequential, data_augmentation: tf.keras.Sequential):
+    inputs = tf.keras.Input(shape=INPUT_SHAPE)  # Define the input shape
+    x = resize_and_scale(inputs)               # Apply resizing and scaling
+    x = data_augmentation(x)                   # Apply data augmentation
+
+    # Add convolutional and pooling layers
+    x = layers.Conv2D(32, kernel_size=(3, 3), activation='relu')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = layers.Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = layers.Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = layers.Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = layers.Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+    x = layers.Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+    x = layers.MaxPooling2D((2, 2))(x)
+
+    # Add the fully connected layers
+    x = layers.Flatten()(x)
+    x = layers.Dense(64, activation='relu')(x)
+    outputs = layers.Dense(N_CLASSES, activation='softmax')(x)
+
+    # Create the model
+    model = tf.keras.Model(inputs=inputs, outputs=outputs)
     return model
 
+def plot_training_history(history):
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
+    epochs = range(1, len(acc) + 1)
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs, acc, 'bo-', label='Training Accuracy')  # Blue dots and line
+    plt.plot(epochs, val_acc, 'ro-', label='Validation Accuracy')  # Red dots and line
+    plt.title('Training and Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.grid()
+    plt.savefig('training_validation_accuracy.png')  # Save the plot
+    print("Plot saved as 'training_validation_accuracy.png'")
 
 if __name__ == "__main__":
     dataset = load_dataset()
@@ -117,3 +137,6 @@ if __name__ == "__main__":
 
     # Evaluate the model
     model.evaluate(test_dataset)
+
+    # Save the model evaluation:
+    plot_training_history(history)
