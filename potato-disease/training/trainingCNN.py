@@ -5,6 +5,12 @@ from matplotlib import pyplot as plt
 
 class DiseaseClassificationCNN:
     def __init__(self, image_size, batch_size, epochs):
+        """
+        Initialize the CNN model for disease classification
+        :param image_size:
+        :param batch_size:
+        :param epochs:
+        """
         self.dataset = None
         self.image_size = image_size
         self.batch_size = batch_size
@@ -30,6 +36,16 @@ class DiseaseClassificationCNN:
 
     def _train_validation_split(self, train_ds, train_size = 0.8, validation_size = 0.1, test_size = 0.1,
                                 shuffle = True, shuffle_size = 10000):
+        """
+        Function will split the dataset into training, validation, and testing datasets
+        :param train_ds:
+        :param train_size:
+        :param validation_size:
+        :param test_size:
+        :param shuffle:
+        :param shuffle_size:
+        :return: train_dataset, validation_dataset, test_dataset
+        """
         assert train_ds is not None, "Dataset is not initialized, please call load dataset"
         # Split the dataset into training, validation, and testing datasets
         total_size = len(train_ds)  # Total number of batches in the dataset
@@ -49,18 +65,30 @@ class DiseaseClassificationCNN:
         return train_dataset, validation_dataset, test_dataset
 
     def resize_and_scale(self) -> tf.keras.Sequential:
+        """
+        Function will resize and scale the image
+        :return:
+        """
         return tf.keras.Sequential([
             layers.Resizing(self.image_size, self.image_size),
             layers.Rescaling(1./255),
         ])
     @staticmethod
     def data_augmentation() -> tf.keras.Sequential:
+        """
+        Function will apply data augmentation to the image
+        :return:
+        """
         return tf.keras.Sequential([
             layers.RandomFlip("horizontal_and_vertical"),
             layers.RandomRotation(0.2),
         ])
 
     def _build_cnn(self):
+        """
+        Function will build the CNN model
+        :return:
+        """
         inputs = tf.keras.Input(shape=self.input_shape)  # Define the input shape
         x = self.resize_and_scale()(inputs)               # Apply resizing and scaling
         x = self.data_augmentation()(x)                   # Apply data augmentation
@@ -89,6 +117,10 @@ class DiseaseClassificationCNN:
         return model
 
     def train_model(self):
+        """
+        Function will train the CNN model
+        :return:
+        """
         # Step 1: build the dataset and split dataset
         self.load_dataset()
         train_dataset, validation_dataset, test_dataset = self._train_validation_split(self.dataset)
@@ -121,20 +153,25 @@ class DiseaseClassificationCNN:
         cnn_model.export("../models/potato_disease_classifier")
 
 def plot_training_history(history):
-        acc = history.history['accuracy']
-        val_acc = history.history['val_accuracy']
-        epochs = range(1, len(acc) + 1)
+    """
+    Function will plot the training and validation accuracy
+    :param history:
+    :return:
+    """
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
+    epochs = range(1, len(acc) + 1)
 
-        plt.figure(figsize=(8, 6))
-        plt.plot(epochs, acc, 'bo-', label='Training Accuracy')  # Blue dots and line
-        plt.plot(epochs, val_acc, 'ro-', label='Validation Accuracy')  # Red dots and line
-        plt.title('Training and Validation Accuracy')
-        plt.xlabel('Epochs')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.grid()
-        plt.savefig('training_validation_accuracy.png')  # Save the plot
-        print("Plot saved as 'training_validation_accuracy.png'")
+    plt.figure(figsize=(8, 6))
+    plt.plot(epochs, acc, 'bo-', label='Training Accuracy')  # Blue dots and line
+    plt.plot(epochs, val_acc, 'ro-', label='Validation Accuracy')  # Red dots and line
+    plt.title('Training and Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.grid()
+    plt.savefig('training_validation_accuracy.png')  # Save the plot
+    print("Plot saved as 'training_validation_accuracy.png'")
 
 
 
