@@ -1,8 +1,6 @@
 import tensorflow as tf
-from sympy.codegen.ast import Raise
 from tensorflow.keras import layers, models
 from matplotlib import pyplot as plt
-from tensorflow.python.ops.gen_batch_ops import batch, batch_function
 
 
 class DiseaseClassificationCNN:
