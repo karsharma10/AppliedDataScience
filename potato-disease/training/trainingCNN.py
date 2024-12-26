@@ -176,5 +176,7 @@ def plot_training_history(history):
 
 
 if __name__ == "__main__":
+    # Initialize the CNN model
     potato_classifier = DiseaseClassificationCNN(image_size=256, batch_size=32, epochs=25)
+    # Train the model
     potato_classifier.train_model()
