@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 class NNCancerClassification:
     def __init__(self):
-        self.input_shape = (30,)  # We have 30 features to use
+        self.input_shape = (10,)  # We have 10 features to use
         self.norm_layer = Normalization(axis=-1)  # Define normalization layer
 
     def normalize_input(self, x_train):
@@ -30,7 +30,7 @@ class NNCancerClassification:
         x = self.norm_layer(input_layer)
 
         # Add dense layers with BatchNormalization and Dropout
-        x = Dense(64, activation='relu')(x)
+        x = Dense(32, activation='relu')(x)
         x = BatchNormalization()(x)
         x = Dropout(0.5)(x)
 
@@ -56,8 +56,20 @@ if __name__ == "__main__":
     y_label = df['diagnosis'].map({'M': 1, 'B': 0})  # Map diagnosis to binary labels
     x_labels = df.drop(columns=['diagnosis', 'id'])  # Drop target and unnecessary columns
 
+    # based on feature engineering (**feature-engineering.py**):
+    columns_to_extract = [
+        'area_worst', 'concave points_worst', 'concave points_mean',
+        'radius_worst', 'concavity_mean', 'perimeter_worst',
+        'perimeter_mean', 'radius_mean', 'area_mean', 'concavity_worst'
+    ]
+
+    # Extract the specified columns
+    subset_df_x_labels = x_labels[columns_to_extract]
+
+    # NOTE: the test score went up when using feature engineering
+
     # Split the dataset
-    X_train, X_test, y_train, y_test = train_test_split(x_labels, y_label, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(subset_df_x_labels, y_label, test_size=0.2, random_state=42)
 
     # Instantiate the class
     newNN = NNCancerClassification()
