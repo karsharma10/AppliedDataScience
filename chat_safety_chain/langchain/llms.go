@@ -1,11 +1,14 @@
 package langchain
 
 import (
+	"context"
+	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
+	"strings"
 )
 
 type ProtectiveLLMChat interface {
-	promptLLM(guard *ollama.LLM, llm *ollama.LLM) (string, error)
+	PromptLLM(ctx context.Context, guard *ollama.LLM, llm *ollama.LLM, question string) (string, error)
 }
 
 type ProtectiveOllamaChat struct {
@@ -29,4 +32,29 @@ func (o *ProtectiveOllamaChat) NewOllamaChat() (*ollama.LLM, error) {
 		return nil, err
 	}
 	return newOllama, nil
+}
+
+func (o *ProtectiveOllamaChat) PromptLLM(ctx context.Context, guard *ollama.LLM, llm *ollama.LLM, question string) (string, error) {
+	// first prompt the Guard to see if this message is safe:
+	content := []llms.MessageContent{
+		llms.TextParts(llms.ChatMessageTypeHuman, question),
+	}
+	generateContent, err := guard.GenerateContent(ctx, content)
+	if err != nil {
+		return "", err
+	}
+	if strings.Contains(strings.ToLower(generateContent.Choices[0].Content), "unsafe") {
+		return "The query that you have provided is not allowed.", nil
+	}
+
+	// if its safe pass it over to the LLM:
+	content = []llms.MessageContent{
+		llms.TextParts(llms.ChatMessageTypeSystem, "You are a helpful, humble chat assistant."),
+		llms.TextParts(llms.ChatMessageTypeHuman, question),
+	}
+	generateContent, err = llm.GenerateContent(ctx, content)
+	if err != nil {
+		return "", err
+	}
+	return generateContent.Choices[0].Content, nil
 }
