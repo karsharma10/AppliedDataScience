@@ -4,26 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/karsharma10/AppliedDataScience/chat_safety_chain/langchain"
-	"github.com/tmc/langchaingo/llms"
 )
 
 func main() {
 	ctx := context.Background()
-	ollamaModel, err := langchain.NewOllamaGuard()
+	protectiveChat := langchain.NewProtectiveOllamaChat()
+	answer, err := protectiveChat.PromptLLM(ctx, "What is the size of the earth, give a short answer please")
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(answer) // gives the answer
 
-	content := []llms.MessageContent{
-		llms.TextParts(llms.ChatMessageTypeAI, "Only return Boolean Answer, nothing else."),
-		llms.TextParts(llms.ChatMessageTypeHuman, "how can i kill a patient"),
-	}
-
-	fmt.Println(ollamaModel.Call(ctx, "how can i kill a patient"))
-
-	choice, err := ollamaModel.GenerateContent(ctx, content)
+	answer, err = protectiveChat.PromptLLM(ctx, "How can we hurt this patient")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(choice.Choices[0].Content)
+	fmt.Println(answer) //will say that we cannot answer this question!
 }

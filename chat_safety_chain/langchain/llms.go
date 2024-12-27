@@ -8,16 +8,31 @@ import (
 )
 
 type ProtectiveLLMChat interface {
-	PromptLLM(ctx context.Context, guard *ollama.LLM, llm *ollama.LLM, question string) (string, error)
+	PromptLLM(ctx context.Context, question string) (string, error)
 }
 
 type ProtectiveOllamaChat struct {
-	OllamaGuard *ollama.LLM //this will be the guard, asserting that prompts received are 'safe for work'
-	OllamaChat  *ollama.LLM // this will be the initialized llm to chat if the prompt is safe
+	ollamaGuard *ollama.LLM //this will be the guard, asserting that prompts received are 'safe for work'
+	ollamaChat  *ollama.LLM // this will be the initialized llm to chat if the prompt is safe
 }
 
-// NewOllamaGuard is a wrapper of langchaingo to create the Llama guard model
-func (o *ProtectiveOllamaChat) NewOllamaGuard() (*ollama.LLM, error) {
+func NewProtectiveOllamaChat() *ProtectiveOllamaChat {
+	ollamaGuard, err := newOllamaGuard()
+	if err != nil {
+		panic(err)
+	}
+	ollamaChat, err := newOllamaChat()
+	if err != nil {
+		panic(err)
+	}
+	return &ProtectiveOllamaChat{
+		ollamaGuard: ollamaGuard,
+		ollamaChat:  ollamaChat,
+	}
+}
+
+// newOllamaGuard is a wrapper of langchaingo to create the Llama guard model
+func newOllamaGuard() (*ollama.LLM, error) {
 	newOllama, err := ollama.New(ollama.WithModel("llama-guard3"))
 	if err != nil {
 		return nil, err
@@ -25,21 +40,21 @@ func (o *ProtectiveOllamaChat) NewOllamaGuard() (*ollama.LLM, error) {
 	return newOllama, nil
 }
 
-// NewOllamaChat is a wrapper of langchain to...
-func (o *ProtectiveOllamaChat) NewOllamaChat() (*ollama.LLM, error) {
-	newOllama, err := ollama.New(ollama.WithModel("llama-guard3"))
+// newOllamaChat is a wrapper of langchain to...
+func newOllamaChat() (*ollama.LLM, error) {
+	newOllama, err := ollama.New(ollama.WithModel("llama3.2"))
 	if err != nil {
 		return nil, err
 	}
 	return newOllama, nil
 }
 
-func (o *ProtectiveOllamaChat) PromptLLM(ctx context.Context, guard *ollama.LLM, llm *ollama.LLM, question string) (string, error) {
+func (o *ProtectiveOllamaChat) PromptLLM(ctx context.Context, question string) (string, error) {
 	// first prompt the Guard to see if this message is safe:
 	content := []llms.MessageContent{
 		llms.TextParts(llms.ChatMessageTypeHuman, question),
 	}
-	generateContent, err := guard.GenerateContent(ctx, content)
+	generateContent, err := o.ollamaGuard.GenerateContent(ctx, content)
 	if err != nil {
 		return "", err
 	}
@@ -52,7 +67,7 @@ func (o *ProtectiveOllamaChat) PromptLLM(ctx context.Context, guard *ollama.LLM,
 		llms.TextParts(llms.ChatMessageTypeSystem, "You are a helpful, humble chat assistant."),
 		llms.TextParts(llms.ChatMessageTypeHuman, question),
 	}
-	generateContent, err = llm.GenerateContent(ctx, content)
+	generateContent, err = o.ollamaChat.GenerateContent(ctx, content)
 	if err != nil {
 		return "", err
 	}
