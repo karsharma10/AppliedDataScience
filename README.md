@@ -7,3 +7,10 @@ A  repository to practice data science projects.
 - If you'd like to run the code, download the dataset and add it to the project folder. (potato-disease/training/PlantVillage/)
   
   **Folder:** ***`potato-disease/`***
+
+## Cancer-classification
+- Download dataset from [Kaggle](https://www.kaggle.com/datasets/rahmasleam/breast-cancer)
+- We are classifying a patient into having cancer with a NN and feature engineering using the dataset.
+- If you'd like to run the code, download the dataset and add it to the project folder. (cancer-detection/training/)
+
+  **Folder:** ***`cancer-detection/`***
