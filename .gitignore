@@ -2,3 +2,4 @@ appliedDSModule
 .idea
 potato-disease/training/PlantVillage/
 .DS_Store
+cancer-detection/training/breast-cancer.csv
