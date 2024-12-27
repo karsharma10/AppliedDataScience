@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 
 if __name__ == "__main__":
-    df = pd.read_csv("breast-cancer.csv")
+    df = pd.read_csv("../training/breast-cancer.csv")
     # Separate features and target
     y_label = df['diagnosis'].map({'M': 1, 'B': 0})  # Map diagnosis to binary labels
     x_labels = df.drop(columns=['diagnosis', 'id'])  # Drop target and unnecessary columns
