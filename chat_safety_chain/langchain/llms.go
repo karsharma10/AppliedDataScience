@@ -40,7 +40,7 @@ func newOllamaGuard() (*ollama.LLM, error) {
 	return newOllama, nil
 }
 
-// newOllamaChat is a wrapper of langchain to...
+// newOllamaChat is a wrapper of langchain to create a llama3.2 model to answer questions for
 func newOllamaChat() (*ollama.LLM, error) {
 	newOllama, err := ollama.New(ollama.WithModel("llama3.2"))
 	if err != nil {
