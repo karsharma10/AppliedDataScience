@@ -16,13 +16,9 @@ A  repository to practice data science projects.
   **Folder:** ***`cancer-detection/`***
 
 
-Here is a simple flow chart:
-
-
+## Document-classification
+- Using transfer learning on BERT to classify documents into categories. Freezing the encoder layer and training the classifier layer.
 ```mermaid
 graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
+    Aws-Textract-->Data-Preprocessing --> Train-BERT-Model --> Inference-Classifier-Model;
 ```
