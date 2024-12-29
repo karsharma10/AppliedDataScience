@@ -14,3 +14,15 @@ A  repository to practice data science projects.
 - If you'd like to run the code, download the dataset and add it to the project folder. (cancer-detection/training/)
 
   **Folder:** ***`cancer-detection/`***
+
+
+Here is a simple flow chart:
+
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
