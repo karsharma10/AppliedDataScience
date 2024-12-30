@@ -42,7 +42,7 @@ def build_classifier_model():
     encoder_inputs = preprocessing_layer(text_input)
 
     # BERT encoder layer
-    encoder = hub.KerasLayer(tfhub_handle_encoder, trainable=False, name='BERT_encoder') # we don't want to update the parameters in the encoder layer
+    encoder = hub.KerasLayer(tfhub_handle_encoder, trainable=True, name='BERT_encoder') # we don't want to update the parameters in the encoder layer
     outputs = encoder(encoder_inputs)
 
     # Use the pooled_output for classification
@@ -82,7 +82,7 @@ print(f"Number of classes: {num_classes}")
 
 # Split the dataset into training and validation sets
 train_texts, val_texts, train_labels, val_labels = train_test_split(
-    df['Text'], df['CLASS'], test_size=0.2, random_state=42
+    df['Text'], df['CLASS'], test_size=0.05, random_state=42
 )
 
 # Convert labels to one-hot encoding
