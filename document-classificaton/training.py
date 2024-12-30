@@ -1,9 +1,13 @@
 import os
 import shutil
-
-import os
 # *** IMPORTANT: Set the environment variable TF_USE_LEGACY_KERAS to 1 before importing tensorflow, due to incompatibility issues*** #
 os.environ['TF_USE_LEGACY_KERAS']='1'
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.utils import to_categorical
+import os
 
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -46,7 +50,7 @@ def build_classifier_model():
     net = tf.keras.layers.Dropout(0.1)(net)
 
     # Dense layer for three-class classification
-    net = tf.keras.layers.Dense(3, activation='softmax', name='classifier')(net)
+    net = tf.keras.layers.Dense(6, activation='softmax', name='classifier')(net)
 
     # Return the model
     return tf.keras.Model(text_input, net)
@@ -63,3 +67,51 @@ classifier_model.compile(
 
 # Summary of the model
 classifier_model.summary()
+
+
+
+# Load dataset
+file_path = 'comprehend_training_data_full.csv'
+df = pd.read_csv(file_path)
+
+# Preprocess the labels
+label_encoder = LabelEncoder()
+df['CLASS'] = label_encoder.fit_transform(df['CLASS'])
+num_classes = len(label_encoder.classes_)
+print(f"Number of classes: {num_classes}")
+
+# Split the dataset into training and validation sets
+train_texts, val_texts, train_labels, val_labels = train_test_split(
+    df['Text'], df['CLASS'], test_size=0.2, random_state=42
+)
+
+# Convert labels to one-hot encoding
+train_labels = to_categorical(train_labels, num_classes=num_classes)
+val_labels = to_categorical(val_labels, num_classes=num_classes)
+
+# Convert texts to numpy arrays
+train_texts = train_texts.values
+val_texts = val_texts.values
+
+# Training
+history = classifier_model.fit(
+    train_texts,
+    train_labels,
+    validation_data=(val_texts, val_labels),
+    epochs=15,  # Adjust based on your dataset
+    batch_size=3  # Adjust based on available resources
+)
+
+# Evaluate the model
+loss, accuracy = classifier_model.evaluate(val_texts, val_labels)
+print(f"Validation Loss: {loss}")
+print(f"Validation Accuracy: {accuracy}")
+
+# Plot training history
+plt.plot(history.history['accuracy'], label='accuracy')
+plt.plot(history.history['val_accuracy'], label='val_accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.ylim([0, 1])
+plt.legend(loc='lower right')
+plt.show()

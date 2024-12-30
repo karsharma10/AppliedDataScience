@@ -3,3 +3,4 @@ appliedDSModule
 potato-disease/training/PlantVillage/
 .DS_Store
 cancer-detection/training/breast-cancer.csv
+document-classificaton/comprehend_training_data_full.csv
