@@ -115,3 +115,7 @@ plt.ylabel('Accuracy')
 plt.ylim([0, 1])
 plt.legend(loc='lower right')
 plt.show()
+
+model_path = 'saved_bert_model'
+classifier_model.save(model_path)
+print(f"Model saved to {model_path}")
