@@ -32,7 +32,7 @@ print(f'Word Ids   : {text_preprocessed["input_word_ids"][0, :12]}')
 print(f'Input Mask : {text_preprocessed["input_mask"][0, :12]}')
 print(f'Type Ids   : {text_preprocessed["input_type_ids"][0, :12]}')
 
-
+# TODO: Try a bigger bert model
 def build_classifier_model():
     # Input layer for raw text
     text_input = tf.keras.layers.Input(shape=(), dtype=tf.string, name='text')
