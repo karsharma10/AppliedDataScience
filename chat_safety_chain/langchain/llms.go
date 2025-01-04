@@ -73,3 +73,5 @@ func (o *ProtectiveOllamaChat) PromptLLM(ctx context.Context, question string) (
 	}
 	return generateContent.Choices[0].Content, nil
 }
+
+//TODO: Lets build tools to make this easier.
