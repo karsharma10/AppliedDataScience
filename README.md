@@ -20,5 +20,5 @@ A  repository to practice data science projects.
 - Using transfer learning on BERT to classify documents into categories. Freezing the encoder layer and training the classifier layer, due to data limitations. 
 ```mermaid
 graph TD;
-    Aws-Textract-->Data-Preprocessing --> Train-Custom-BERT-Model --> Inference-Classifier-Model; 
+    Aws-Textract-->Data-Preprocessing --> Train-Custom-BERT-Model --> Inference-Classifier-Model;  
 ```
