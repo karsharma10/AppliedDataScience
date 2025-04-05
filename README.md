@@ -21,4 +21,5 @@ A  repository to practice data science projects.
 ```mermaid
 graph TD;
     Aws-Textract-->Data-Preprocessing --> Train-Custom-BERT-Model --> Inference-Classifier-Model;  
+
 ``` 
